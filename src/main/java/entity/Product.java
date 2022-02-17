@@ -35,8 +35,4 @@ public class Product {
     public Date getCreationDate() {
         return creationDate;
     }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }

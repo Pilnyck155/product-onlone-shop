@@ -15,6 +15,7 @@
         <th scope="col">#</th>
         <th scope="col">Name</th>
         <th scope="col">Price</th>
+        <th scope="col">Action</th>
     </tr>
     </thead>
     <tbody>
@@ -24,10 +25,15 @@
                 <td>${product.name}</td>
                 <td>${product.price}</td>
                 <td>${product.creationDate}</td>
+                <td>
+                    <a href="/products/edit?id=${product.id}" class="btn btn-warning">Edit</a>
+                    <a href="/products/delete?id=${product.id}" class="btn btn-danger">Delete</a>
+                </td>
             </tr>
         </#list>
     </tbody>
 </table>
+    <a href="/products/add" class="btn btn-primary">Go to Add</a>
 </div>
 </body>
 </html>
