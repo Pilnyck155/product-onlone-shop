@@ -14,6 +14,11 @@ public class Product {
         this.price = price;
         this.creationDate = creationDate;
     }
+    public Product(String name, int price, Date creationDate) {
+        this.name = name;
+        this.price = price;
+        this.creationDate = creationDate;
+    }
 
     public int getId() {
         return id;
@@ -29,5 +34,9 @@ public class Product {
 
     public Date getCreationDate() {
         return creationDate;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

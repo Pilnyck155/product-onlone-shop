@@ -15,7 +15,11 @@ import java.util.Map;
 
 public class AllProductsServlet extends HttpServlet {
 
-    ProductService productService = new ProductService();
+    public AllProductsServlet(ProductService productService) {
+        this.productService = productService;
+    }
+
+    ProductService productService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

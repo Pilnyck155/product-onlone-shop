@@ -1,5 +1,6 @@
 package service;
 
+import dao.ProductDao;
 import entity.Product;
 
 import java.sql.Date;
@@ -7,11 +8,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductService {
+    ProductDao productDao;
+
+    public ProductService(ProductDao productDao) {
+        this.productDao = productDao;
+    }
+    //List<Product> productList = new ArrayList<>();
+
     public List<Product> findAll(){
-        List<Product> productList = new ArrayList<>();
-        productList.add(new Product(1, "milk", 27, new Date(2021-5-12)));
-        productList.add(new Product(2, "bread", 24, new Date(2021-6-21)));
-        productList.add(new Product(3, "honey", 29, new Date(2021-7-18)));
-        return productList;
+        System.out.println("In findAll ProductService");
+        List<Product> products = productDao.findAll();
+        return products;
+    }
+
+    public void saveProduct(Product product) {
+        System.out.println("In saveProduct ProductService");
+        //product.setId(4);
+        //productDao.save;
     }
 }
