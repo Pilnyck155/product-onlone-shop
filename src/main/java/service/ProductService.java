@@ -1,22 +1,19 @@
 package service;
 
-import dao.ProductDao;
+import dao.jdbc.JdbcProductDao;
 import entity.Product;
 
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductService {
-    ProductDao productDao;
+    JdbcProductDao productDao;
 
-    public ProductService(ProductDao productDao) {
+    public ProductService(JdbcProductDao productDao) {
         this.productDao = productDao;
     }
 
     public List<Product> findAll(){
-        List<Product> products = productDao.findAll();
-        return products;
+        return productDao.findAll();
     }
 
     public void saveProduct(Product product) {

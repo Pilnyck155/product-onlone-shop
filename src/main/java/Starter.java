@@ -1,17 +1,17 @@
-import dao.ProductDao;
+import dao.jdbc.JdbcProductDao;
 import service.ProductService;
-import servlet.AddProductServlet;
-import servlet.AllProductsServlet;
+import web.servlet.AddProductServlet;
+import web.servlet.AllProductsServlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import servlet.DeleteProductServlet;
-import servlet.EditProductServlet;
+import web.servlet.DeleteProductServlet;
+import web.servlet.EditProductServlet;
 
 public class Starter {
     public static void main(String[] args) throws Exception {
         //dao
-        ProductDao productDao = new ProductDao();
+        JdbcProductDao productDao = new JdbcProductDao();
 
         //services
         ProductService productService = new ProductService(productDao);
