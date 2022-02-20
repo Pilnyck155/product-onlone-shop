@@ -1,14 +1,14 @@
 package service;
 
-import dao.jdbc.JdbcProductDao;
+import dao.ProductDao;
 import entity.Product;
 
 import java.util.List;
 
 public class ProductService {
-    JdbcProductDao productDao;
+    ProductDao productDao;
 
-    public ProductService(JdbcProductDao productDao) {
+    public ProductService(ProductDao productDao) {
         this.productDao = productDao;
     }
 

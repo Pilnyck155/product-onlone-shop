@@ -13,27 +13,16 @@ import java.util.Map;
 public class PageGenerator {
     private static final String HTML_DIR = "src/main/resources/templates";
 
-    private static PageGenerator pageGenerator;
-    private final Configuration cfg;
+    private static final Configuration cfg = new Configuration();
 
-    public static PageGenerator instance() {
-        if (pageGenerator == null)
-            pageGenerator = new PageGenerator();
-        return pageGenerator;
-    }
-
-    public String getPage(String filename, Map<String, Object> data) {
-        Writer stream = new StringWriter();
+    public static String getPage(String filename, Map<String, Object> data) {
         try {
+            Writer stream = new StringWriter();
             Template template = cfg.getTemplate(HTML_DIR + File.separator + filename);
             template.process(data, stream);
+            return stream.toString();
         } catch (IOException | TemplateException e) {
             throw new RuntimeException(e);
         }
-        return stream.toString();
-    }
-
-    private PageGenerator() {
-        cfg = new Configuration();
     }
 }

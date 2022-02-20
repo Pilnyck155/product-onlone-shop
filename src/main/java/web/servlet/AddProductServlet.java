@@ -3,20 +3,17 @@ package web.servlet;
 import entity.Product;
 import service.ProductService;
 import web.PageGenerator;
+import web.ProductManager;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.sql.Date.*;
-
 public class AddProductServlet extends HttpServlet {
-    private  final ProductService productService;
-    PageGenerator pageGenerator = PageGenerator.instance();
+    private final ProductService productService;
 
     public AddProductServlet(ProductService productService) {
         this.productService = productService;
@@ -25,7 +22,7 @@ public class AddProductServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Map<String, Object> pageVariables = new HashMap<>();
-        String products = pageGenerator.getPage("add_product.html", pageVariables);
+        String products = PageGenerator.getPage("add_product.html", pageVariables);
 
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -34,14 +31,10 @@ public class AddProductServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String productName = request.getParameter("productName");
-        int price = Integer.parseInt(request.getParameter("price"));
-        String date = request.getParameter("creationDate");
-        Date creationDate = valueOf(date);
-        Product product = new Product(productName, price, creationDate);
-        productService.saveProduct(product);
+        Product productFromRequest = ProductManager.getProductFromRequest(request);
 
-        response.setContentType("text/html;charset=utf-8");
+        productService.saveProduct(productFromRequest);
+
         response.sendRedirect("/products/add");
     }
 }

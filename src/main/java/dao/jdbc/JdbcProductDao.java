@@ -1,17 +1,21 @@
 package dao.jdbc;
 
-import dao.ProductRowMapper;
+import dao.ProductDao;
+import dao.jdbc.mapper.ProductRowMapper;
 import entity.Product;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.sql.DriverManager.getConnection;
 
 public class JdbcProductDao implements ProductDao {
-    ProductRowMapper productRowMapper = new ProductRowMapper();
-    ConnectionFactory connectionFactory = new ConnectionFactory();
+    private static final ProductRowMapper PRODUCT_ROW_MAPPER = new ProductRowMapper();
+    private final ConnectionFactory connectionFactory;
+
+    public JdbcProductDao(ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+    }
 
     private static final String GET_ALL_PRODUCTS = "SELECT id, name, price, creation_date FROM Product";
     private static final String GET_PRODUCT_BY_ID = "SELECT id, name, price, creation_date FROM Product WHERE id = ?";
@@ -21,76 +25,72 @@ public class JdbcProductDao implements ProductDao {
 
 
     @Override
-    public List<Product> findAll(){
-        try(Connection connection = connectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_PRODUCTS);
-            ResultSet resultSet = preparedStatement.executeQuery()) {
+    public List<Product> findAll() {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_ALL_PRODUCTS);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             List<Product> list = new ArrayList<>();
-            while (resultSet.next()){
-                Product product = productRowMapper.mapRow(resultSet);
+            while (resultSet.next()) {
+                Product product = PRODUCT_ROW_MAPPER.mapRow(resultSet);
                 list.add(product);
             }
-         return list;
+            return list;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't return all products", e);
         }
-        return null;
     }
 
     @Override
     public void save(Product product) {
-        try(Connection connection = connectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_PRODUCT)) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SAVE_PRODUCT)) {
             preparedStatement.setString(1, product.getName());
             preparedStatement.setInt(2, product.getPrice());
-            preparedStatement.setDate(3, product.getCreationDate());
-            preparedStatement.execute();
+            preparedStatement.setDate(3, Date.valueOf(product.getCreationDate()));
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't save product", e);
         }
     }
 
     @Override
     public void deleteById(int id) {
-        try(Connection connection = connectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PRODUCT_BY_ID)) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PRODUCT_BY_ID)) {
             preparedStatement.setInt(1, id);
-            preparedStatement.execute();
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't delete product with id " + id, e);
         }
     }
 
     @Override
     public void editProductById(Product product) {
-        try(Connection connection = connectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(EDIT_PRODUCT_BY_ID)) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(EDIT_PRODUCT_BY_ID)) {
             preparedStatement.setString(1, product.getName());
             preparedStatement.setInt(2, product.getPrice());
-            preparedStatement.setDate(3, product.getCreationDate());
+            preparedStatement.setDate(3, Date.valueOf(product.getCreationDate()));
             preparedStatement.setInt(4, product.getId());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't edit product with id " + product.getId(), e);
         }
     }
 
     @Override
     public Product getProductById(int id) {
-        try(Connection connection = connectionFactory.getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(GET_PRODUCT_BY_ID)) {
+        try (Connection connection = connectionFactory.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(GET_PRODUCT_BY_ID)) {
             preparedStatement.setInt(1, id);
-            preparedStatement.execute();
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            Product product = null;
-            while (resultSet.next()){
-                product = productRowMapper.mapRow(resultSet);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return PRODUCT_ROW_MAPPER.mapRow(resultSet);
+                }
+                return null;
             }
-            return product;
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Couldn't find product with id " + id, e);
         }
-        return null;
     }
 }

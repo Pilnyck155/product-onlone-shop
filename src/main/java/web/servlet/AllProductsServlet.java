@@ -23,10 +23,9 @@ public class AllProductsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         List<Product> productList = productService.findAll();
 
-        PageGenerator pageGenerator = PageGenerator.instance();
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("products", productList);
-        String products = pageGenerator.getPage("products.html", pageVariables);
+        String products = PageGenerator.getPage("products.html", pageVariables);
 
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);

@@ -3,20 +3,17 @@ package web.servlet;
 import entity.Product;
 import service.ProductService;
 import web.PageGenerator;
+import web.ProductManager;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static java.sql.Date.valueOf;
-
 public class EditProductServlet extends HttpServlet {
     private final ProductService productService;
-    PageGenerator pageGenerator = PageGenerator.instance();
 
     public EditProductServlet(ProductService productService) {
         this.productService = productService;
@@ -26,10 +23,15 @@ public class EditProductServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         Product product = productService.getProductById(id);
+        if (product == null){
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.sendRedirect("/products");
+            return;
+        }
 
         Map<String, Object> pageVariables = new HashMap<>();
         pageVariables.put("product", product);
-        String products = pageGenerator.getPage("edit_product.html", pageVariables);
+        String products = PageGenerator.getPage("edit_product.html", pageVariables);
 
         response.setContentType("text/html;charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
@@ -38,13 +40,9 @@ public class EditProductServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws  IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        String productName = request.getParameter("productName");
-        int price = Integer.parseInt(request.getParameter("price"));
-        String date = request.getParameter("creationDate");
-        Date creationDate = valueOf(date);
-        Product product = new Product(id, productName, price, creationDate);
-        productService.editProductById(product);
+        Product productFromRequest = ProductManager.getProductFromRequest(request);
+
+        productService.editProductById(productFromRequest);
         response.sendRedirect("/products");
     }
 }
