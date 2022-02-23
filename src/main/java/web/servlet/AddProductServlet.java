@@ -2,9 +2,11 @@ package web.servlet;
 
 import entity.Product;
 import service.ProductService;
+import service.SecurityService;
 import web.PageGenerator;
 import web.ProductManager;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,27 +16,44 @@ import java.util.Map;
 
 public class AddProductServlet extends HttpServlet {
     private final ProductService productService;
+    private final SecurityService securityService;
 
-    public AddProductServlet(ProductService productService) {
+    public AddProductServlet(ProductService productService, SecurityService securityService) {
         this.productService = productService;
+        this.securityService = securityService;
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Map<String, Object> pageVariables = new HashMap<>();
-        String products = PageGenerator.getPage("add_product.html", pageVariables);
+        Cookie[] cookies = request.getCookies();
 
-        response.setContentType("text/html;charset=utf-8");
-        response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().println(products);
+        boolean isAuthorized = securityService.checkCookies(cookies);
+        if (isAuthorized) {
+            response.sendRedirect("/login");
+        } else {
+
+            Map<String, Object> pageVariables = new HashMap<>();
+            String products = PageGenerator.getPage("add_product.html", pageVariables);
+
+            response.setContentType("text/html;charset=utf-8");
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.getWriter().println(products);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Product productFromRequest = ProductManager.getProductFromRequest(request);
+        Cookie[] cookies = request.getCookies();
 
-        productService.saveProduct(productFromRequest);
+        boolean isAuthorized = securityService.checkCookies(cookies);
+        if (isAuthorized) {
+            response.sendRedirect("/login");
+        } else {
+            Product productFromRequest = ProductManager.getProductFromRequest(request);
 
-        response.sendRedirect("/products/add");
+            productService.saveProduct(productFromRequest);
+
+            response.sendRedirect("/products/add");
+        }
     }
 }
