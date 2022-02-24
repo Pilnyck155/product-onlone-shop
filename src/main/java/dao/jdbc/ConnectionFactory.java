@@ -64,9 +64,4 @@ public class ConnectionFactory implements DataSource {
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
         return false;
     }
-
-//    public Connection getConnection() throws SQLException {
-//        return DriverManager.getConnection(url, username, password);
-//    }
-
 }

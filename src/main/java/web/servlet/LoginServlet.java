@@ -17,11 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LoginServlet extends HttpServlet {
-   // Logger logger = LoggerFactory.getLogger(getClass());
-    Logger logger = LoggerFactory.getLogger(LoginServlet.class);
+    Logger logger = LoggerFactory.getLogger(getClass());
 
     private final SecurityService securityService;
-    //private final UserService userService;
 
     public LoginServlet(SecurityService service) {
         this.securityService = service;
@@ -39,27 +37,19 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Cookie[] cookies = request.getCookies();
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        logger.info("Current email {}", email);
+        logger.info("Current password {}", password);
 
-        boolean isAuthorized = securityService.checkCookies(cookies);
-        if (isAuthorized) {
-            response.sendRedirect("/login");
-        } else {
-
-            String email = request.getParameter("email");
-            String password = request.getParameter("password");
-            logger.info("Current email {}", email);
-            logger.info("Current password {}", password);
-
-            if (email != null && password != null) {
-                boolean validateUser = securityService.validateUser(email, password);
-                if (validateUser) {
-                    Cookie cookie = securityService.generateCookie();
-                    response.addCookie(cookie);
-                    response.sendRedirect("/products");
-                } else {
-                    response.sendRedirect("/login");
-                }
+        if (email != null && password != null) {
+            boolean validateUser = securityService.validateUser(email, password);
+            if (validateUser) {
+                Cookie cookie = securityService.generateCookie();
+                response.addCookie(cookie);
+                response.sendRedirect("/products");
+            } else {
+                response.sendRedirect("/login");
             }
         }
     }

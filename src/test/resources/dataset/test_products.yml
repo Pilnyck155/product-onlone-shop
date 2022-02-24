@@ -1,0 +1,13 @@
+USER: Product
+  - ID: 20
+    NAME: "garlic"
+        PRICE: 18
+            CREATION_DATE: 2021-07-08
+  - ID: 21
+    NAME: "orange"
+       PRICE: 29
+            CREATION_DATE: 2021-10-17
+  - ID: 21
+    NAME: "orange"
+        PRICE: 29
+            CREATION_DATE: 2020-03-21

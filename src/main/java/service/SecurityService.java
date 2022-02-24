@@ -19,10 +19,12 @@ public class SecurityService {
     private final List<String> tokens = Collections.synchronizedList(new ArrayList<>());
 
     public boolean checkCookies(Cookie[] cookies) {
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("user-token")) {
-                if (tokens.contains(cookie.getValue())) {
-                    return true;
+        if (cookies != null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("user-token")) {
+                    if (tokens.contains(cookie.getValue())) {
+                        return true;
+                    }
                 }
             }
         }
@@ -32,6 +34,7 @@ public class SecurityService {
     public Cookie generateCookie() {
         String token = UUID.randomUUID().toString();
         String cookieName = "user-token";
+        tokens.add(token);
         return new Cookie(cookieName, token);
     }
 

@@ -16,44 +16,28 @@ import java.util.Map;
 
 public class AddProductServlet extends HttpServlet {
     private final ProductService productService;
-    private final SecurityService securityService;
 
-    public AddProductServlet(ProductService productService, SecurityService securityService) {
+    public AddProductServlet(ProductService productService) {
         this.productService = productService;
-        this.securityService = securityService;
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Cookie[] cookies = request.getCookies();
+        Map<String, Object> pageVariables = new HashMap<>();
+        String products = PageGenerator.getPage("add_product.html", pageVariables);
 
-        boolean isAuthorized = securityService.checkCookies(cookies);
-        if (isAuthorized) {
-            response.sendRedirect("/login");
-        } else {
-
-            Map<String, Object> pageVariables = new HashMap<>();
-            String products = PageGenerator.getPage("add_product.html", pageVariables);
-
-            response.setContentType("text/html;charset=utf-8");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().println(products);
-        }
+        response.setContentType("text/html;charset=utf-8");
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.getWriter().println(products);
     }
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Cookie[] cookies = request.getCookies();
+        Product productFromRequest = ProductManager.getProductFromRequest(request);
 
-        boolean isAuthorized = securityService.checkCookies(cookies);
-        if (isAuthorized) {
-            response.sendRedirect("/login");
-        } else {
-            Product productFromRequest = ProductManager.getProductFromRequest(request);
+        productService.saveProduct(productFromRequest);
 
-            productService.saveProduct(productFromRequest);
-
-            response.sendRedirect("/products/add");
-        }
+        response.sendRedirect("/products/add");
     }
 }
